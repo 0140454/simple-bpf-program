@@ -9,7 +9,7 @@ ifeq "$(LLC)" ""
     $(error Cannot find llc (llvm)!)
 endif
 
-.build/bpf.o: bpf.c
+.build/bpf.o: bpf.c bpf_shared.h
 	@mkdir -p .build
 	clang -O2 -emit-llvm -c bpf.c -o - | llc -march=bpf -filetype=obj -o .build/bpf.o
 
