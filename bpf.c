@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include <linux/bpf.h>
 #include <linux/filter.h>
@@ -26,18 +27,19 @@
 struct bpf_elf_map __section("maps") map_arp_cnt = {
     .type       = BPF_MAP_TYPE_HASH,
     .id         = BPF_MAP_ID_ARP_COUNT,
+    .pinning    = PIN_GLOBAL_NS,
     .size_key   = sizeof(__u32),
     .size_value = sizeof(__u64),
     .max_elem   = 256,
 };
 
-static inline int is_arp_packet(struct __sk_buff *skb)
+static inline bool is_arp_packet(struct __sk_buff *skb)
 {
     __u16 proto = load_half(skb, offsetof(struct ethhdr, h_proto));
     return (proto == ETH_P_ARP);
 }
 
-static inline int arp_packet_type(struct __sk_buff *skb)
+static inline __u16 arp_packet_type(struct __sk_buff *skb)
 {
     return load_half(skb, ETH_HLEN + offsetof(struct arphdr, ar_op));
 }
